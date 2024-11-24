@@ -13,12 +13,11 @@ population_df = spark.read.csv("/mnt/c/Users/Mahamat Adam/OneDrive/Documents/Cou
 insurance_df = spark.read.csv("/mnt/c/Users/Mahamat Adam/OneDrive/Documents/Cours 2023-2024/S2/Data integration/projet/project-data-integration/input_data/self-employment-income-in-the-past-12-months-for-households.csv", header=True, inferSchema=True)
 employment_df = spark.read.csv("/mnt/c/Users/Mahamat Adam/OneDrive/Documents/Cours 2023-2024/S2/Data integration/projet/project-data-integration/input_data/self-employment-income-in-the-past-12-months-for-households.csv", header=True, inferSchema=True)
 
-# Assurez-vous que la colonne 'Id' existe dans chaque DataFrame et qu'elle a le même type
 population_df = population_df.withColumn("Id", population_df["Id"].cast("string"))
 insurance_df = insurance_df.withColumn("Id", insurance_df["Id"].cast("string"))
 employment_df = employment_df.withColumn("Id", employment_df["Id"].cast("string"))
 
-# Définir la structure du message Kafka attendu (ici un JSON avec une colonne 'Id')
+# structure du message Kafka attendu (ici un JSON avec une colonne 'Id')
 kafka_schema = StructType([
     StructField("Id", StringType(), True),
     StructField("some_other_column", StringType(), True)  # Ajouter d'autres colonnes si nécessaire
@@ -35,7 +34,7 @@ kafka_stream_df = spark.readStream \
     .option("subscribe", topic) \
     .load()
 
-# Kafka envoie les messages sous forme de bytes, vous devez donc les convertir en chaînes de caractères
+
 kafka_stream_df = kafka_stream_df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
 # Traiter les données du Kafka stream
